@@ -8,3 +8,7 @@ export const BaseAction = type({
 export type Action<T extends object = Record<string, unknown>> = typeof BaseAction.infer & {
   options: T
 }
+
+export interface FullAction<T extends object = Record<string, unknown>> extends Action<T> {
+  page?: string
+}

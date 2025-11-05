@@ -1,14 +1,17 @@
-import { message, type Message } from 'xsai'
+import { message, streamText, type Message, type StreamTextEvent } from 'xsai'
 import * as prompts from './prompts'
-import type { Action } from '@chat-tutor/shared'
+import { getPageTools, getActionTools } from './tools'
+import type { Action, FullAction, Page } from '@chat-tutor/shared'
+import type { ReadableStream } from 'node:stream/web'
 
 export type TextChunkAction = Action<{ chunk: string }>
 
 export interface AgentOptions {
   apiKey: string
-  baseUrl: string
+  baseURL: string
   model: string
   messages: Message[]
+  pages: Page[]
 }
 
 export const createAgent = (options: AgentOptions) => {
@@ -19,9 +22,31 @@ export const createAgent = (options: AgentOptions) => {
   }
 
   // eslint-disable-next-line require-yield
-  return async function* (input: string): AsyncGenerator<Action> {
-    options.messages.push(
-      message.user(input)
-    )
+  return async function* (input: string): AsyncGenerator<FullAction> {
+    const tools = (await Promise.all([
+      getPageTools(options.pages),
+      getActionTools(options.pages)
+    ])).flat()
+    options.messages.push(message.user(input))
+    const { fullStream } = streamText({
+      model: options.model,
+      apiKey: options.apiKey,
+      baseURL: options.baseURL,
+      messages: options.messages,
+      tools,
+    })
+    for await (const chunk of <ReadableStream<StreamTextEvent>>fullStream) {
+      if (chunk.type === 'text-delta') {
+        yield { type: 'text', options: { chunk: chunk.text } } satisfies TextChunkAction
+      }
+      if (chunk.type === 'tool-call') {
+        if (chunk.toolName === 'act') {
+          const { actions } = JSON.parse(chunk.args) as { page: string, actions: FullAction[] }
+          for (const action of actions) {
+            yield action
+          }
+        }
+      }
+    }
   }
 }

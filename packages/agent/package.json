@@ -9,8 +9,10 @@
   "scripts": {},
   "packageManager": "pnpm@10.8.1",
   "dependencies": {
-    "xsai": "0.4.0-beta.8",
+    "@chat-tutor/canvas": "workspace:*",
     "@chat-tutor/shared": "workspace:*",
-    "@chat-tutor/canvas": "workspace:*"
+    "@types/node": "^24.10.0",
+    "arktype": "^2.1.25",
+    "xsai": "0.4.0-beta.8"
   }
 }
