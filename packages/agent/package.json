@@ -1,0 +1,14 @@
+{
+  "name": "@chat-tutor/agent",
+  "version": "0.0.0",
+  "main": "index.js",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {},
+  "packageManager": "pnpm@10.8.1",
+  "dependencies": {
+    "xsai": "0.4.0-beta.8"
+  }
+}
