@@ -1,6 +1,14 @@
 import type { Message } from '#shared/types'
+import type { ActionHandler } from './useBoard'
+import type { FullAction, Action } from '@chat-tutor/shared'
+import type { PageCreationAction, TextChunkAction } from '@chat-tutor/agent'
+import type { CanvasPageAction } from '@chat-tutor/canvas'
 
-export const useChat = () => {
+export type AllAction = FullAction | Action | PageCreationAction | TextChunkAction | CanvasPageAction
+
+export const useChat = (
+  handleAction: ActionHandler,
+) => {
   const messages = ref<Message[]>([])
   const input = ref('')
   const { params } = useRoute()
@@ -30,11 +38,12 @@ export const useChat = () => {
     
     eventSource.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data)
+        const data = JSON.parse(event.data) as AllAction
+        console.log(data)
         if (data.type === 'text') {
-          messages.value.at(-1)!.content += data.options.chunk
+          messages.value.at(-1)!.content += (<TextChunkAction>data).options.chunk
         } else {
-          console.log(data)
+          handleAction(<FullAction>data)
         }
       } catch (error) {
         console.error('Failed to parse event data:', error)

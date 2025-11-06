@@ -1,4 +1,4 @@
-import { defineElement } from '../renderer'
+import { defineElement } from '../element-structor'
 import { calculate } from './utils'
 
 export interface FuncAttributes {

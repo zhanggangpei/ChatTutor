@@ -1,6 +1,6 @@
 import { registerCanvasElementDocument } from '../document'
 
-registerCanvasElementDocument({
+export default registerCanvasElementDocument({
   name: 'line',
   description: 'A line on the canvas',
   attrs: [

@@ -1,4 +1,5 @@
 export * from './document'
 export * from './element'
+export * from './element-structor'
 export * from './page'
 export * from './renderer'

@@ -28,7 +28,9 @@ export const contential = (document: CanvasElementDocument) => {
 export const canvasElementDocuments = new Map<string, CanvasElementDocument>()
 export const registerCanvasElementDocument = (document: CanvasElementDocument) => {
   canvasElementDocuments.set(document.name, document)
+  return document
 }
 export const unregisterCanvasElementDocument = (name: string) => {
   canvasElementDocuments.delete(name)
+  return name
 }

@@ -5,10 +5,11 @@ export const BaseAction = type({
   options: type.object
 })
 
-export type Action<T extends object = Record<string, unknown>> = typeof BaseAction.infer & {
+export type Action<T extends object = Record<string, unknown>, A extends string = string> = typeof BaseAction.infer & {
+  type: A
   options: T
 }
 
-export interface FullAction<T extends object = Record<string, unknown>> extends Action<T> {
+export interface FullAction<T extends object = Record<string, unknown>, A extends string = string> extends Action<T, A> {
   page?: string
 }

@@ -1,4 +1,6 @@
-import { canvasElementDocuments, contential } from '@chat-tutor/canvas/document'
+/* eslint-disable import/no-duplicates */
+import { contential } from '@chat-tutor/canvas/document'
+import docs from '@chat-tutor/canvas/document'
 
 export const system = () => {
   return `
@@ -37,7 +39,7 @@ export const system = () => {
 
   ## Canvas Elements
 
-  ${Array.from(canvasElementDocuments.entries().map(([_, document]) => contential(document))).join('\n')}
+  ${Array.from(docs.map((document) => contential(document))).join('\n')}
 
   ## Code of Conduct
   - For a requirement from user, please divide it into several steps, and perform each step one by one.

@@ -3,10 +3,11 @@ import type { Action, FullAction } from './action'
 export enum PageType {
   TEXT = 'text',
   CANVAS = 'canvas',
+  PAGE = 'page',
 }
 
-export interface Page<T extends Action = FullAction> {
-  type: string | PageType
+export interface Page<T extends Action = FullAction, A extends string = string> {
+  type: A
   title: string
   id?: string
   steps: T[]

@@ -1,10 +1,13 @@
 import { message, streamText, type Message, type StreamTextEvent } from 'xsai'
 import * as prompts from './prompts'
 import { getPageTools, getActionTools } from './tools'
+import { PageType } from '@chat-tutor/shared'
 import type { Action, FullAction, Page } from '@chat-tutor/shared'
 import type { ReadableStream } from 'node:stream/web'
+import type { CanvasPage } from '@chat-tutor/canvas'
 
-export type TextChunkAction = Action<{ chunk: string }>
+export type TextChunkAction = Action<{ chunk: string }, 'text'>
+export type PageCreationAction<T extends Page = Page> = Action<T, 'page'>
 
 export interface AgentOptions {
   apiKey: string
@@ -21,7 +24,7 @@ export const createAgent = (options: AgentOptions) => {
     )
   }
 
-  // eslint-disable-next-line require-yield
+   
   return async function* (input: string): AsyncGenerator<FullAction> {
     const tools = (await Promise.all([
       getPageTools(options.pages),
@@ -46,10 +49,14 @@ export const createAgent = (options: AgentOptions) => {
       }
       if (chunk.type === 'tool-call') {
         if (chunk.toolName === 'act') {
-          const { actions } = JSON.parse(chunk.args) as { page: string, actions: FullAction[] }
+          const { actions, page } = JSON.parse(chunk.args) as { page: string, actions: FullAction[] }
           for (const action of actions) {
-            yield action
+            yield { ...action, page }
           }
+        }
+        if (chunk.toolName === 'create_canvas') {
+          const { id, title, range, domain } = JSON.parse(chunk.args) as { id: string, title: string, range: [number, number], domain: [number, number] }
+          yield { type: 'page', options: { id, title, type: PageType.CANVAS, range, domain, steps: [] } } satisfies PageCreationAction<CanvasPage>
         }
       }
     }

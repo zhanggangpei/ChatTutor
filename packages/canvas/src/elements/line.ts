@@ -1,4 +1,4 @@
-import { defineElement } from '../renderer'
+import { defineElement } from '../element-structor'
 
 export interface LineAttributes {
   from: [number, number]

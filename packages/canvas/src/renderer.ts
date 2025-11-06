@@ -2,12 +2,11 @@ import { JSXGraph, type Board } from 'jsxgraph'
 import type { CanvasPageAction } from './page'
 import type { ElementAction } from './element'
 import { structures } from './elements'
+import type { ElementStructor, ElementGetter } from './element-structor'
 
-export type ElementStructor<T extends object = object> = (options: T, getter: ElementGetter) => 
-  (board: Board) => unknown
-export const defineElement = <T extends object>(constructor: ElementStructor<T>) => constructor
+export type { ElementStructor, ElementGetter }
+export { defineElement } from './element-structor'
 export type ElementPool = Map<string, unknown>
-export type ElementGetter = <T = unknown>(id: string) => T
 export const elements = new Map<string, ElementStructor>()
 export const registerElement = <T extends object>(name: string, constructor: ElementStructor<T>) => {
   elements.set(name, <ElementStructor<object>>constructor)
@@ -17,7 +16,7 @@ structures.forEach(([name, constructor]) => registerElement(name, constructor))
 
 export const createCanvasRenderer = (id: string) => {
   const board = JSXGraph.initBoard(id, {
-    boundingBox: [0, 0, 100, 100],
+    boundingBox: [-10, 10, 10, -10],
     grid: true,
   })
   const pool = new Map<string, unknown>()
@@ -28,7 +27,7 @@ export const createCanvasRenderer = (id: string) => {
   const add = (action: typeof ElementAction.infer) => {
     const element = elements.get(action.options.name)
     if (element) {
-      const setup = element(action.options, getElement)
+      const setup = element(action.options.attrs, getElement)
       pool.set(action.options.id, setup(board))
     }
   }

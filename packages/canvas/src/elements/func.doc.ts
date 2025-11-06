@@ -1,6 +1,6 @@
 import { registerCanvasElementDocument } from '../document'
 
-registerCanvasElementDocument({
+export default registerCanvasElementDocument({
   name: 'func',
   description: 'A function on the canvas',
   attrs: [
