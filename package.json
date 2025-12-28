@@ -11,7 +11,10 @@
     "dev:web": "pnpm --filter @chat-tutor/web dev",
     "build": "pnpm --filter @chat-tutor/* build",
     "build:client": "pnpm --filter @chat-tutor/client build",
-    "build:web": "pnpm --filter @chat-tutor/web build"
+    "build:web": "pnpm --filter @chat-tutor/web build",
+    "db:push": "pnpm --filter @chat-tutor/db push",
+    "db:generate": "pnpm --filter @chat-tutor/db generate",
+    "db:studio": "pnpm --filter @chat-tutor/db studio"
   },
   "packageManager": "pnpm@10.14.0",
   "dependencies": {
