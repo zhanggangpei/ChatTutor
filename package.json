@@ -3,5 +3,5 @@
   "private": true,
   "version": "1.0.0",
   "description": "ChatTutor Monorepo",
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@10.14.0"
 }
