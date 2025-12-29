@@ -5,7 +5,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts"
   },
+  "exports": {
+    "./sdk": "./src/sdk.ts"
+  },
   "dependencies": {
+    "@elysiajs/eden": "^1.4.6",
     "elysia": "latest"
   },
   "devDependencies": {
