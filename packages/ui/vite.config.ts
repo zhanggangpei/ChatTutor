@@ -29,6 +29,7 @@ export default defineConfig({
         new URL('./src/components/index.ts', import.meta.url)
       ),
       formats: ['es'],
+      fileName: 'index',
     },
     rollupOptions: {
       external: ['vue'],

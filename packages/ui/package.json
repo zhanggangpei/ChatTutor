@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "types": "./dist/index.d.ts",
-  "exports": "./dist/ui.js",
+  "exports": "./dist/index.js",
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },
