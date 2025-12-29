@@ -1,29 +1,20 @@
-import { PageType, type Action, type FullAction, type Page } from '@chat-tutor/shared'
-import type {
-  PageCreationAction,
-  NoteStartAction,
-  NoteEndAction,
-  MermaidStartAction,
-  MermaidEndAction,
-  GGBStartAction,
-  GGBEndAction,
-  PlanStartAction,
-  PlanEndAction,
-} from '@chat-tutor/agent'
-import type { MermaidPage } from './mermaid'
 import { mermaidBlockResolver } from './mermaid'
 import { noteBlockResolver } from './note'
 import { ggbBlockResolver } from './ggb'
+import { PageType } from '@chat-tutor/shared'
+import type { BasePage, Action, PlanTaskAction, PlanCompleteAction, PageCreateAction, NoteTaskAction, MermaidTaskAction, GGBTaskAction, ClientAction, NoteCompleteAction } from '@chat-tutor/shared'
+import { MermaidCompleteAction } from '@chat-tutor/shared'
+import { GGBCompleteAction } from '@chat-tutor/shared'
 
 export type BlockResolver = (context: {
-  page: Page
+  page: BasePage
   content: string
-}, emit: Emit) => Action | FullAction
+}, emit: Emit) => Action<object, string> | void
 
-type Emit = (action: FullAction | PageCreationAction) => void
+type Emit = (action: ClientAction | void) => void
 
 export interface BlockParserOptions {
-  pages: Page[]
+  pages: BasePage[]
   emit: Emit                // create page / set-mermaid etc TODO: set note
   emitText: (chunk: string) => void // 继续输出普通文本
 }
@@ -45,7 +36,7 @@ const planEndTag = '</plan>'
 export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions) => {
   const blockResolvers = new Map<string, {
     resolver: BlockResolver
-    pageType: PageType
+    pageType?: PageType
   }>()
 
   blockResolvers.set('mermaid', {
@@ -53,8 +44,7 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
     pageType: PageType.MERMAID,
   })
   blockResolvers.set('note', {
-    resolver: noteBlockResolver,
-    pageType: PageType.TEXT,
+    resolver: noteBlockResolver
   })
   blockResolvers.set('ggbscript', {
     resolver: ggbBlockResolver,
@@ -105,6 +95,7 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
   // Try to parse plan tags
   const tryParsePlan = (): boolean => {
     // Check for <plan> start tag
+    const taskId = crypto.randomUUID()
     const planStartIdx = buffer.indexOf(planStartTag)
     if (planStartIdx !== -1 && state === 'idle') {
       // Emit text before plan tag
@@ -120,9 +111,10 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
       planContent = ''
       // Emit plan-start action
       emit({
-        type: 'plan-start',
-        options: {},
-      } as PlanStartAction)
+        type: 'task',
+        taskId,
+        taskType: 'plan',
+      } as PlanTaskAction)
       return true
     }
 
@@ -136,9 +128,11 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
         state = 'idle'
         // Emit plan-end action with content
         emit({
-          type: 'plan-end',
+          type: 'task-complete',
           options: { content: planContent },
-        } as PlanEndAction)
+          taskId,
+          taskType: 'plan',
+        } as PlanCompleteAction)
         planContent = ''
         return true
       }
@@ -148,73 +142,83 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
   }
 
   // Check if page exists, if not create it
-  const ensurePage = (id: string, type: string, title?: string) => {
+  const ensurePage = (id: string, type: string | null, title?: string) => {
     let page = pages.find(p => p.id === id)
+    if (!type) return page!
     if (!page) {
       page = {
         id,
         title: title || 'Untitled',
         type,
         steps: [],
-        notes: [],
       }
       pages.push(page)
       emit({
-        type: 'page',
-        options: page,
-      } as PageCreationAction<MermaidPage>)
+        type: 'page-create',
+        options: { page },
+      } satisfies PageCreateAction)
     }
     return page
   }
 
   // Emit start action for a block
-  const emitStartAction = (blockType: string, pageId: string) => {
+  const emitStartAction = (blockType: string, pageId: string, taskId: string) => {
     if (blockType === 'note') {
       emit({
-        type: 'note-start',
-        options: { page: pageId },
+        type: 'task',
+        taskId,
+        taskType: 'note',
+        options: { content: '' },
         page: pageId,
-      } as NoteStartAction)
+      } as NoteTaskAction)
     } else if (blockType === 'mermaid') {
       emit({
-        type: 'mermaid-start',
-        options: { page: pageId },
-        page: pageId,
-      } as MermaidStartAction)
+        type: 'task',
+        taskId,
+        taskType: 'mermaid',
+        options: { content: '' },
+      } satisfies MermaidTaskAction)
     } else if (blockType === 'ggbscript' || blockType === 'geogebra') {
       emit({
-        type: 'ggb-start',
-        options: { page: pageId },
-        page: pageId,
-      } as GGBStartAction)
+        type: 'task',
+        taskId,
+        taskType: 'ggb',
+        options: { content: '' },
+      } satisfies GGBTaskAction)
     }
   }
 
   // Emit end action for a block
-  const emitEndAction = (blockType: string, pageId: string) => {
+  const emitEndAction = (blockType: string, pageId: string, taskId: string) => {
     if (blockType === 'note') {
       emit({
-        type: 'note-end',
-        options: { page: pageId },
+        type: 'task-complete',
+        options: { content: '' },
+        taskId,
+        taskType: 'note',
         page: pageId,
-      } as NoteEndAction)
+      } satisfies NoteCompleteAction)
     } else if (blockType === 'mermaid') {
       emit({
-        type: 'mermaid-end',
-        options: { page: pageId },
+        type: 'task-complete',
+        options: { content: '' },
+        taskId,
+        taskType: 'mermaid',
         page: pageId,
-      } as MermaidEndAction)
+      } satisfies MermaidCompleteAction)
     } else if (blockType === 'ggbscript' || blockType === 'geogebra') {
       emit({
-        type: 'ggb-end',
-        options: { page: pageId },
+        type: 'task-complete',
+        options: { content: '' },
+        taskId,
+        taskType: 'ggb',
         page: pageId,
-      } as GGBEndAction)
+      } satisfies GGBCompleteAction)
     }
   }
 
   // Complete the mermaid block
-  const finishBlock = (content: string) => {
+  const finishBlock = (content: string, taskId: string) => {
     if (!blockMeta) return
     const block = blockMeta as BlockMeta
     const trimmedContent = content.trimEnd()
@@ -230,16 +234,16 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
     if (!resolver) {
       return blockMeta = null
     }
-    const page = ensurePage(block.page, pageType, block.title)
+    const page = ensurePage(block.page, pageType || null, block.title)
     // Emit the actual action with data (this will be added to steps)
     resolver({ page, content: trimmedContent }, emit)
     // Emit end action
-    emitEndAction(block.type, block.page)
+    emitEndAction(block.type, block.page, taskId)
     blockMeta = null
   }
       
-  // Parse mermaid blocks
   const tryParse = () => {
+    const taskId = crypto.randomUUID()
     if (!blockMeta) {
       const fenceIdx = buffer.indexOf(fenceStart)
       if (fenceIdx === -1 && state === 'idle') {
@@ -269,10 +273,10 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
       // Ensure page exists before emitting start action
       const resolverInfo = blockResolvers.get(type)
       if (resolverInfo) {
-        ensurePage(pageId, resolverInfo.pageType, title)
+        ensurePage(pageId, resolverInfo.pageType || null, title)
       }
       // Emit start action when block starts
-      emitStartAction(type, pageId)
+      emitStartAction(type, pageId, taskId)
       return
     }
     // Inside a block, look for end fence
@@ -286,17 +290,17 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
     if (!endMatch || endMatch.index !== 0) return
     // Full block matched
     buffer = tail.slice(endMatch[0].length)
-    finishBlock(content)
+    finishBlock(content, taskId)
     state = 'idle'
   }
 
   return {
-    handle(action: FullAction) {
+    handle(action: ClientAction) {
       if (action.type !== 'text') {
         emit(action)
         return
       }
-      buffer += action.options.chunk
+      buffer += action.options.text
       // debug: Check buffer content
       // console.log('buffer updated:', buffer)
       while (true) {
