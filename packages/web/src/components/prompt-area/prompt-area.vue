@@ -1,9 +1,249 @@
 <script setup lang="ts">
-import { Textarea } from '@chat-tutor/ui'
+import { ref } from 'vue'
+import { Button, Spinner } from '@chat-tutor/ui'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faPaperPlane, faImage } from '@fortawesome/free-solid-svg-icons'
+import type { PromptAreaProps, PromptAreaEmits, Resource } from './types'
+import ImagePreview from './image-preview.vue'
+
+const props = withDefaults(defineProps<PromptAreaProps>(), {
+  running: false
+})
+
+const emits = defineEmits<PromptAreaEmits>()
+
+const input = defineModel<string>('input', { required: true, default: '' })
+const resources = defineModel<Resource[]>('resources', { required: true, default: () => [] })
+
+const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const uploading = ref(false)
+const isDragging = ref(false)
+
+// Focus and blur methods
+const blur = () => {
+  textareaRef.value?.blur()
+}
+
+const focus = () => {
+  textareaRef.value?.focus()
+}
+
+// Send message
+const sendUserInput = () => {
+  if (props.running) return
+  if (input.value.trim() === '' && resources.value.length === 0) return
+
+  blur()
+  emits('send', input.value, resources.value)
+  input.value = ''
+  resources.value = []
+}
+
+// Keyboard shortcut (Cmd/Ctrl + Enter)
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (props.running) return
+  if (input.value.trim() === '' && resources.value.length === 0) return
+
+  if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+    event.preventDefault()
+    sendUserInput()
+  }
+}
+
+// File upload handling
+const uploadFile = async (file: File) => {
+  if (!file.type.startsWith('image/')) {
+    console.error('Only image files are allowed')
+    return
+  }
+
+  uploading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await fetch('/api/file/upload', {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!response.ok) {
+      throw new Error('Upload failed')
+    }
+
+    const data = await response.json() as { url: string; id: string; key: string }
+
+    resources.value.push({
+      type: 'image',
+      url: data.url,
+      id: data.id,
+    })
+  } catch (error) {
+    console.error('Failed to upload file:', error)
+  } finally {
+    uploading.value = false
+  }
+}
+
+// Paste handling
+const handlePaste = async (event: ClipboardEvent) => {
+  const items = event.clipboardData?.items
+  if (!items) return
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
+    if (item && item.type.startsWith('image/')) {
+      event.preventDefault()
+      const file = item.getAsFile()
+      if (file) {
+        await uploadFile(file)
+      }
+    }
+  }
+}
+
+// Drag and drop handling
+const handleDragOver = (event: DragEvent) => {
+  event.preventDefault()
+  isDragging.value = true
+}
+
+const handleDragLeave = (event: DragEvent) => {
+  event.preventDefault()
+  isDragging.value = false
+}
+
+const handleDrop = async (event: DragEvent) => {
+  event.preventDefault()
+  isDragging.value = false
+
+  const files = event.dataTransfer?.files
+  if (!files) return
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
+    if (file && file.type.startsWith('image/')) {
+      await uploadFile(file)
+    }
+  }
+}
+
+// Image button click
+const handleImageButtonClick = () => {
+  fileInputRef.value?.click()
+}
+
+// File select handling
+const handleFileSelect = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const files = target.files
+  if (!files) return
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
+    if (file) {
+      await uploadFile(file)
+    }
+  }
+
+  if (fileInputRef.value) {
+    fileInputRef.value.value = ''
+  }
+}
+
+// Remove resource
+const removeResource = (id: string) => {
+  resources.value = resources.value.filter(r => r.id !== id)
+}
+
+defineExpose({
+  blur,
+  focus
+})
 </script>
 
 <template>
-  <div class="flex size-full">
-    <Textarea class="h-full flex"/>
+  <div
+    class="size-full bg-gray-50 dark:bg-gray-800 p-3 rounded-2xl flex flex-col border shadow-lg transition-all"
+    :class="isDragging ? 'border-blue-500 border-2 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'"
+    @dragover="handleDragOver"
+    @dragleave="handleDragLeave"
+    @drop="handleDrop"
+    @paste="handlePaste"
+  >
+    <!-- Textarea -->
+    <textarea
+      ref="textareaRef"
+      v-model="input"
+      placeholder="Type your message... (Cmd/Ctrl + Enter to send)"
+      class="flex-1 w-full bg-transparent outline-none resize-none text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+      @keydown="handleKeyDown"
+    />
+
+    <!-- Image previews -->
+    <div
+      v-if="resources.length > 0"
+      class="flex flex-row items-center w-full gap-2 mt-2 mb-2"
+    >
+      <ImagePreview
+        v-for="resource in resources"
+        :key="resource.id"
+        :url="resource.url"
+        @remove="removeResource(resource.id)"
+      />
+    </div>
+
+    <!-- Action buttons -->
+    <div class="flex flex-row items-center justify-between w-full gap-2 mt-2">
+      <!-- Image upload button -->
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        :disabled="uploading || running"
+        @click="handleImageButtonClick"
+      >
+        <Spinner
+          v-if="uploading"
+          class="size-4"
+        />
+        <FontAwesomeIcon
+          v-else
+          :icon="faImage"
+          class="size-4"
+        />
+      </Button>
+
+      <!-- Hidden file input -->
+      <input
+        ref="fileInputRef"
+        type="file"
+        accept="image/*"
+        multiple
+        class="hidden"
+        @change="handleFileSelect"
+      >
+
+      <!-- Send button -->
+      <Button
+        :disabled="running || (input.trim() === '' && resources.length === 0)"
+        size="sm"
+        @click="sendUserInput"
+      >
+        <Spinner
+          v-if="running"
+          class="size-4"
+        />
+        <FontAwesomeIcon
+          v-else
+          :icon="faPaperPlane"
+          class="size-4"
+        />
+        <span class="ml-2 hidden md:inline">
+          Send
+        </span>
+      </Button>
+    </div>
   </div>
 </template>
+

@@ -10,7 +10,7 @@ const open = ref(route.path === '/')
 
 <template>
   <SidebarProvider v-model:open="open">
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" variant="floating">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
