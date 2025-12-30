@@ -165,7 +165,7 @@ defineExpose({
 
 <template>
   <div
-    class="size-full bg-gray-50 dark:bg-gray-800 p-3 rounded-2xl flex flex-col border shadow-lg transition-all"
+    class="size-full bg-gray-50 dark:bg-gray-800 p-3 rounded-2xl flex flex-col border transition-all"
     :class="isDragging ? 'border-blue-500 border-2 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'"
     @dragover="handleDragOver"
     @dragleave="handleDragLeave"

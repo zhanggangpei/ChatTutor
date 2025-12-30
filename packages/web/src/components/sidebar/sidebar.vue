@@ -15,8 +15,8 @@ watch(router.currentRoute, (route) => {
 
 <template>
   <SidebarProvider v-model:open="open">
-    <Sidebar collapsible="icon" variant="floating">
-      <SidebarContent>
+    <Sidebar collapsible="icon" variant="inset">
+      <SidebarContent class="text-gray-500 select-none dark:text-gray-400">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>

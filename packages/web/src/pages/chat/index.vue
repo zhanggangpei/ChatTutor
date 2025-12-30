@@ -1,5 +1,19 @@
+<script setup lang="ts">
+import { ChatUI, ChatBoard, ChatPagination } from '#/components/chat'
+</script>
+
 <template>
-  <div class="size-full flex items-center justify-center">
-    <h1 class="text-2xl">Chat Page</h1>
+  <div class="size-full flex flex-row">
+    <div class="w-5/7 flex flex-col h-full p-1 gap-2">
+      <div class="flex flex-row h-5/7">
+        <ChatBoard />
+      </div>
+      <div class="flex flex-row h-2/7">
+        <ChatPagination />
+      </div>
+    </div>
+    <div class="w-2/7">
+      <ChatUI />
+    </div>
   </div>
 </template>

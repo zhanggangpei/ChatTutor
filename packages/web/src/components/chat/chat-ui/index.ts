@@ -1,0 +1,1 @@
+export { default as ChatUI } from './chat.vue'
