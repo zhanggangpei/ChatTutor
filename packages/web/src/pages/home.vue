@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { PromptArea, type Resource } from '#/components/prompt-area'
+import { PromptArea } from '#/components/prompt-area'
+import { type Resource } from '@chat-tutor/shared'
 import { client } from '#/utils/client'
 import { useCreateChatStore } from '#/utils/stores'
 import { useRouter } from 'vue-router'

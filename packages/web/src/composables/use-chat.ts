@@ -1,4 +1,4 @@
-import type { Resource } from '#/components/prompt-area'
+import type { Resource } from '@chat-tutor/shared'
 import { client } from '#/utils/client'
 import { createMessageResolver, type ClientAction, type ClientMessage, type Page } from '@chat-tutor/shared'
 import type { EdenWS } from '@elysiajs/eden/treaty'
@@ -11,7 +11,7 @@ export const useChat = (id: string) => {
   const stream = ref<EdenWS | null>(null)
   const streamOpen = ref(false)
 
-  const resolve = createMessageResolver({
+  const resolveAction = createMessageResolver({
     get: () => messages.value,
     push: (message) => {
       messages.value.push(message)
@@ -46,7 +46,7 @@ export const useChat = (id: string) => {
         })
         stream.value.on('message', (message) => {
           const action = message.data as unknown as ClientAction
-          resolve(action)
+          resolveAction(action)
         })
       })
     }
@@ -55,6 +55,7 @@ export const useChat = (id: string) => {
         type: 'user-input',
         options: {
           prompt,
+          resources,
         },
       }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

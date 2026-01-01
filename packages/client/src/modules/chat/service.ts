@@ -124,7 +124,7 @@ export const createChatStream = () => {
             resolve(action)
             emit(action)
           },
-          images: [],
+          resources: input.options.resources || [],
         })
         console.log(messages)
       }

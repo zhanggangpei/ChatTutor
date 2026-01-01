@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { Resource } from '#/components/prompt-area'
+import type { Resource } from '@chat-tutor/shared'
 
 export interface CreateChatState {
   prompt: string | null

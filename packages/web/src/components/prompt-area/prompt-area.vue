@@ -3,7 +3,8 @@ import { ref } from 'vue'
 import { Button, Spinner } from '@chat-tutor/ui'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faPaperPlane, faImage } from '@fortawesome/free-solid-svg-icons'
-import type { PromptAreaProps, PromptAreaEmits, Resource } from './types'
+import type { PromptAreaProps, PromptAreaEmits } from './types'
+import type { Resource } from '@chat-tutor/shared'
 import ImagePreview from './image-preview.vue'
 
 const props = withDefaults(defineProps<PromptAreaProps>(), {

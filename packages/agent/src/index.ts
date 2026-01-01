@@ -1,4 +1,4 @@
-import { AgentOptions, AgentInput } from './types'
+import { AgentOptions, AgentInput, convertResources } from './types'
 import { streamText } from 'ai'
 import { createGateway } from './gateway'
 import { createBlockParser } from './utils'
@@ -17,7 +17,7 @@ export const createAgent = (options: AgentOptions) => {
     })
   }
   
-  return async ({ prompt, emit, images }: AgentInput) => {
+  return async ({ prompt, emit, resources }: AgentInput) => {
     const { handle } = createBlockParser({
       pages: [],
       emit,
@@ -31,7 +31,7 @@ export const createAgent = (options: AgentOptions) => {
     options.messages.push({
       role: 'user', content: [
         { type: 'text', text: prompt },
-        ...(images?.map(image => ({ type: 'image' as const, image: new URL(image) })) || []),
+        ...convertResources(resources || []),
       ]
     })
     const savedContext = structuredClone(options.messages)

@@ -1,10 +1,4 @@
-export interface ImageResource {
-  type: 'image'
-  url: string
-  id: string
-}
-
-export type Resource = ImageResource
+import type { Resource } from '@chat-tutor/shared'
 
 export interface PromptAreaEmits {
   (e: 'send', input: string, resources: Resource[]): void
