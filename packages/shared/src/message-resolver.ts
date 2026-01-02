@@ -78,6 +78,8 @@ export const createMessageResolver = ({ get, push, uuid }: MessageResolverOption
       case 'task-complete':
         const taskMessage = findTaskRelatedMessage(action.taskId) as TaskClientMessage
         taskMessage.running = false
+        const content = (action.options as { content: string }).content
+        taskMessage.content = content
         break
       case 'page-create':
         push({

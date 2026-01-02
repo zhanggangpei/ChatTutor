@@ -192,11 +192,11 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
   }
 
   // Emit end action for a block
-  const emitEndAction = (blockType: string, pageId: string, taskId: string) => {
+  const emitEndAction = (blockType: string, pageId: string, taskId: string, content: string) => {
     if (blockType === 'note') {
       emit({
         type: 'task-complete',
-        options: { content: '' },
+        options: { content },
         taskId,
         taskType: 'note',
         page: pageId,
@@ -204,7 +204,7 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
     } else if (blockType === 'mermaid') {
       emit({
         type: 'task-complete',
-        options: { content: '' },
+        options: { content },
         taskId,
         taskType: 'mermaid',
         page: pageId,
@@ -212,7 +212,7 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
     } else if (blockType === 'ggbscript' || blockType === 'geogebra') {
       emit({
         type: 'task-complete',
-        options: { content: '' },
+        options: { content },
         taskId,
         taskType: 'ggb',
         page: pageId,
@@ -241,7 +241,7 @@ export const createBlockParser = ({ pages, emit, emitText }: BlockParserOptions)
     // Emit the actual action with data (this will be added to steps)
     resolver({ page, content: trimmedContent }, emit)
     // Emit end action
-    emitEndAction(block.type, block.page, taskId)
+    emitEndAction(block.type, block.page, taskId, content)
     blockMeta = null
   }
       

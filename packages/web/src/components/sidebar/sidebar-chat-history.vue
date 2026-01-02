@@ -21,7 +21,6 @@ const fetchItems = async () => {
   if (error || !data) {
     return
   }
-  console.log(data)
   items.value = data.map((item) => ({
     title: item.title,
     url: `/chat/${item.id}`,
