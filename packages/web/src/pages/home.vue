@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { PromptArea } from '#/components/prompt-area'
 import { type Resource } from '@chat-tutor/shared'
 import { client } from '#/utils/client'
 import { useCreateChatStore } from '#/utils/stores'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const input = ref('')
 const resources = ref<Resource[]>([])
@@ -12,6 +13,7 @@ const running = ref(false)
 
 const store = useCreateChatStore()
 const router = useRouter()
+const { t } = useI18n()
 
 const handleSend = async (message: string, attachments: Resource[]) => {
   const { data, error } = await client.chat.post({
@@ -25,6 +27,18 @@ const handleSend = async (message: string, attachments: Resource[]) => {
   const { id } = data
   router.push(`/chat/${id}`)
 }
+
+const getTime = (): 'morning' | 'afternoon' | 'evening' => {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'morning'
+  if (hour < 18) return 'afternoon'
+  return 'evening'
+}
+
+const greeting = computed(() => {
+  const time = getTime()
+  return t('home.title', { time: t(`home.greeting.${time}`) })
+})
 </script>
 
 <template>
@@ -39,7 +53,7 @@ const handleSend = async (message: string, attachments: Resource[]) => {
     </div>
     <div class="flex size-full items-center justify-center flex-col gap-18">
       <h1 class="text-4xl title select-none font-mono">
-        Hello, let's begin!
+        {{ greeting }}
       </h1>
       <div class="h-32 w-full max-w-2xl">
         <PromptArea
