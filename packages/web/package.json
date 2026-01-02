@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@chat-tutor/client": "workspace:*",
+    "@chat-tutor/ggb-applet": "workspace:*",
     "@chat-tutor/shared": "workspace:*",
     "@chat-tutor/ui": "workspace:*",
     "@elysiajs/eden": "^1.4.6",
@@ -26,6 +27,7 @@
     "mermaid": "11.12.1",
     "pinia": "^3.0.4",
     "tailwindcss": "^4.1.18",
+    "uuid": "^13.0.0",
     "vue": "^3.5.24",
     "vue-i18n": "^11.2.8",
     "vue-router": "^4.6.4"

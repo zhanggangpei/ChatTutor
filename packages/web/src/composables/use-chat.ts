@@ -3,6 +3,8 @@ import { client } from '#/utils/client'
 import { createMessageResolver, type ClientAction, type ClientMessage, type Page } from '@chat-tutor/shared'
 import type { EdenWS } from '@elysiajs/eden/treaty'
 import { ref } from 'vue'
+import { v4 as uuidv4 } from 'uuid'
+import { createActionStack } from './use-action-stack'
 
 export const useChat = (id: string) => {
   const messages = ref<ClientMessage[]>([])
@@ -12,12 +14,24 @@ export const useChat = (id: string) => {
   const stream = ref<EdenWS | null>(null)
   const streamOpen = ref(false)
 
+  const { push } = createActionStack('chat')
+
+  const handleAction = (action: ClientAction) => {
+    if (action.page) {
+      push(action)
+    }
+    if (action.type === 'page-create') {
+      pages.value.push(action.options.page)
+      currentPage.value = action.options.page.id
+    }
+  }
+
   const resolveAction = createMessageResolver({
     get: () => messages.value,
     push: (message) => {
       messages.value.push(message)
     },
-    uuid: () => crypto.randomUUID(),
+    uuid: () => uuidv4(),
   })
 
   const switchPage = (id: string) => {
@@ -56,6 +70,7 @@ export const useChat = (id: string) => {
         stream.value.on('message', (message) => {
           const action = message.data as unknown as ClientAction
           resolveAction(action)
+          handleAction(action)
           if (action.type === 'end') {
             running.value = false
           }

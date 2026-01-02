@@ -1,5 +1,5 @@
 {
-  "name": "@chat-tutor/geogebra-applet",
+  "name": "@chat-tutor/ggb-applet",
   "version": "0.0.1",
   "description": "TypeScript type declarations for GeoGebra Apps API",
   "types": "./src/index.d.ts",

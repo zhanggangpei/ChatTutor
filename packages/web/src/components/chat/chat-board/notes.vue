@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import type { NoteAppendAction, Page } from '@chat-tutor/shared'
-import { MarkdownRender } from 'markstream-vue'
+import type { Page } from '@chat-tutor/shared'
+import PageNotes from './page-notes.vue'
 
 defineProps<{
   pages: Page[]
   current: string | null
 }>()
-
-const filterNotes = (page: Page) => {
-  const steps = page.steps.filter(step => step.type === 'note-append')
-  return steps.map(step => (step as NoteAppendAction).options.content).join('\n')
-}
 </script>
 
 <template>
@@ -21,8 +16,9 @@ const filterNotes = (page: Page) => {
         v-for="page in pages"
         v-show="current === page.id"
         :key="page.id"
+class="size-full"
       >
-        <MarkdownRender :content="filterNotes(page)" />
+        <PageNotes :page="page" />
       </div>
     </div>
   </div>

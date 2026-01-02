@@ -1,4 +1,4 @@
-import { BasePage } from './page'
+import { Page } from './page'
 
 export interface Action<T, K extends string> {
   type: K
@@ -20,7 +20,7 @@ export interface TaskCompleteAction<T, J extends string> extends Action<T, 'task
 // Base actions
 
 export type TextAction = Action<{ text: string }, 'text'>
-export type PageCreateAction = Action<{ page: BasePage }, 'page-create'>
+export type PageCreateAction = Action<{ page: Page }, 'page-create'>
 export type EndAction = Action<object, 'end'>
 
 export type PlanTaskAction = TaskAction<object, 'plan'>
