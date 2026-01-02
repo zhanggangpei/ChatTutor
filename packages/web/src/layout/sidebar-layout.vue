@@ -3,7 +3,7 @@ import { Sidebar } from '#/components/sidebar'
 </script>
 
 <template>
-  <div class="w-full flex">
+  <div class="size-full flex overflow-hidden">
     <Sidebar>
       <template #main>
         <RouterView />

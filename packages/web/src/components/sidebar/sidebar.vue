@@ -55,7 +55,7 @@ watch(router.currentRoute, (route) => {
         <SidebarChatHistory v-show="open" />
       </SidebarContent>
     </Sidebar>
-    <main class="w-full">
+    <main class="size-full overflow-hidden">
       <slot name="main" />
     </main>
   </SidebarProvider>

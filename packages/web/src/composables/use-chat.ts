@@ -1,4 +1,4 @@
-import type { Resource } from '@chat-tutor/shared'
+import type { Resource, UserInputAction } from '@chat-tutor/shared'
 import { client } from '#/utils/client'
 import { createMessageResolver, type ClientAction, type ClientMessage, type Page } from '@chat-tutor/shared'
 import type { EdenWS } from '@elysiajs/eden/treaty'
@@ -47,19 +47,24 @@ export const useChat = (id: string) => {
         stream.value.on('message', (message) => {
           const action = message.data as unknown as ClientAction
           resolveAction(action)
+          if (action.type === 'end') {
+            running.value = false
+          }
         })
       })
     }
+    const action: UserInputAction = {
+      type: 'user-input',
+      options: {
+        prompt,
+        resources,
+      },
+    }
     stream.value?.send({
-      action: {
-        type: 'user-input',
-        options: {
-          prompt,
-          resources,
-        },
-      }
+      action,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
+    resolveAction(action)
   }
 
   return {

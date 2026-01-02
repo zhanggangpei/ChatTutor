@@ -100,7 +100,6 @@ export const createChatStream = () => {
   const resolve = createMessageResolver({
     get: () => messages,
     push: (message) => {
-      console.log(message)
       messages.push(message)
     },
     uuid: () => crypto.randomUUID(),
@@ -126,7 +125,7 @@ export const createChatStream = () => {
           },
           resources: input.options.resources || [],
         })
-        console.log(messages)
+        console.log(agentContext.map(c => c.role).join(', '))
       }
     },
   }

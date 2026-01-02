@@ -12,9 +12,7 @@ export const createAgent = (options: AgentOptions) => {
     provider: options.provider,
   })
   if (options.messages.length === 0) {
-    options.messages.push({
-      role: 'system', content: agent.system()
-    })
+    options.messages.push()
   }
   
   return async ({ prompt, emit, resources }: AgentInput) => {
@@ -34,10 +32,14 @@ export const createAgent = (options: AgentOptions) => {
         ...convertResources(resources || []),
       ]
     })
-    const savedContext = structuredClone(options.messages)
     const { textStream, response } = streamText({
       model: gateway(options.model),
-      messages: options.messages,
+      messages: [
+        {
+          role: 'system', content: agent.system()
+        },
+        ...options.messages,
+      ],
     })
     for await (const chunk of textStream) {
       handle({
@@ -50,7 +52,7 @@ export const createAgent = (options: AgentOptions) => {
       options: {},
     })
     const messages = (await response).messages
-    options.messages.push(...savedContext, ...messages)
+    options.messages.push(...messages)
   }
 }
 
