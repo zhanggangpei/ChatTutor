@@ -5,7 +5,5 @@
   "editor.formatOnPaste": true,
   "editor.formatOnType": true,
   "editor.formatOnSaveMode": "modifications",
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "prettier.singleQuote": true,
-  "prettier.semi": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
