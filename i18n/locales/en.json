@@ -41,24 +41,27 @@
   },
   "message": {
     "types": {
-      "setMermaid": {
-        "running": "Setting mermaid on {page}...",
-        "completed": "Mermaid set on {page}"
+      "mermaid": {
+        "running": "Creating diagram...",
+        "completed": "Diagram created"
       },
       "note": {
-        "running": "Adding note to {page}...",
-        "completed": "Note added to {page}"
+        "running": "Creating note...",
+        "completed": "Note created"
       },
       "ggb": {
-        "running": "Running GeoGebra script on {page}...",
-        "completed": "GeoGebra script executed on {page}"
+        "running": "Creating GeoGebra...",
+        "completed": "GeoGebra created"
       },
       "page": {
-        "created": "Created {pageType} page: {page}"
+        "created": "Created page: {title}"
       },
       "plan": {
         "running": "Planning...",
-        "completed": "Planning completed"
+        "completed": "Plan completed"
+      },
+      "error": {
+        "prefix": "Error: {message}"
       }
     }
   },
@@ -71,6 +74,8 @@
   },
   "chat": {
     "notes": "Notes",
-    "send": "Send"
+    "send": "Send",
+    "placeholder": "Type your message here...",
+    "uploadImage": "Upload Image"
   }
 }

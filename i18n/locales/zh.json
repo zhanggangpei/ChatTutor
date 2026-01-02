@@ -41,24 +41,27 @@
   },
   "message": {
     "types": {
-      "setMermaid": {
-        "running": "正在 {page} 上设置 mermaid...",
-        "completed": "Mermaid 已在 {page} 上设置"
+      "mermaid": {
+        "running": "正在创建图表...",
+        "completed": "图表已创建"
       },
       "note": {
-        "running": "正在向 {page} 添加笔记...",
-        "completed": "笔记已添加到 {page}"
+        "running": "正在创建笔记...",
+        "completed": "笔记已创建"
       },
       "ggb": {
-        "running": "正在 {page} 上运行 GeoGebra 脚本...",
-        "completed": "GeoGebra 脚本已在 {page} 上执行"
+        "running": "正在创建 GeoGebra...",
+        "completed": "GeoGebra 已创建"
       },
       "page": {
-        "created": "已创建 {pageType} 页面：{page}"
+        "created": "已创建页面：{title}"
       },
       "plan": {
         "running": "正在规划...",
         "completed": "规划完成"
+      },
+      "error": {
+        "prefix": "错误：{message}"
       }
     }
   },
@@ -71,6 +74,8 @@
   },
   "chat": {
     "notes": "笔记",
-    "send": "发送"
+    "send": "发送",
+    "placeholder": "输入消息...",
+    "uploadImage": "上传图片"
   }
 }

@@ -5,6 +5,7 @@ import type { ClientMessage, PageCreateClientMessage, ErrorClientMessage } from 
 import { MarkdownRender } from 'markstream-vue'
 import { messageIcons } from './message-icons'
 import { computed, ref, inject, type Ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   message: ClientMessage
@@ -13,6 +14,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   click: []
 }>()
+
+const { t } = useI18n()
 
 // Page context for navigation
 const page = inject<Ref<string | null>>('page', ref(null))
@@ -37,18 +40,18 @@ const displayContent = computed(() => {
   
   if (msg.type === 'page-create') {
     const pageMsg = msg as PageCreateClientMessage
-    return `Created page: ${pageMsg.title || pageMsg.page}`
+    return t('message.types.page.created', { title: pageMsg.title || pageMsg.page })
   } else if (msg.type === 'plan') {
-    return msg.running ? 'Planning...' : 'Plan completed'
+    return msg.running ? t('message.types.plan.running') : t('message.types.plan.completed')
   } else if (msg.type === 'note') {
-    return msg.running ? 'Creating note...' : 'Note created'
+    return msg.running ? t('message.types.note.running') : t('message.types.note.completed')
   } else if (msg.type === 'mermaid') {
-    return msg.running ? 'Creating diagram...' : 'Diagram created'
+    return msg.running ? t('message.types.mermaid.running') : t('message.types.mermaid.completed')
   } else if (msg.type === 'ggb') {
-    return msg.running ? 'Creating GeoGebra...' : 'GeoGebra created'
+    return msg.running ? t('message.types.ggb.running') : t('message.types.ggb.completed')
   } else if (msg.type === 'error') {
     const errorMsg = msg as ErrorClientMessage
-    return `Error: ${errorMsg.error}`
+    return t('message.types.error.prefix', { message: errorMsg.error })
   }
   
   return ''
