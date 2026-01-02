@@ -11,9 +11,11 @@ const route = useRoute()
 const {
   messages,
   pages,
+  currentPage,
   running,
   sync,
-  ask
+  ask,
+  switchPage
 } = useChat(route.params.id as string)
 
 const loading = ref(true)
@@ -21,6 +23,9 @@ const store = useCreateChatStore()
 
 onMounted(async () => {
   await sync()
+  if (pages.value.length > 0) {
+    switchPage(pages.value[0]!.id)
+  }
   if (store.prompt !== null || store.resources.length > 0) {
     const prompt = store.prompt!
     const resources = store.resources
@@ -38,17 +43,27 @@ onMounted(async () => {
   <template v-if="loading">
     <Loading />
   </template>
-  <div v-else class="size-full flex flex-row overflow-hidden">
+  <div
+    v-else
+    class="size-full flex flex-row overflow-hidden"
+  >
     <div class="w-5/7 flex flex-col h-full py-2 gap-2 overflow-hidden">
       <div class="flex flex-row flex-1 min-h-0 overflow-hidden">
-        <ChatBoard />
+        <ChatBoard :pages="pages" :current="currentPage" />
       </div>
       <div class="flex flex-row h-48 shrink-0">
-        <ChatPagination />
+        <ChatPagination
+          :pages="pages"
+          @switch="switchPage"
+        />
       </div>
     </div>
     <div class="w-2/7 h-full overflow-hidden">
-      <ChatUI v-model:messages="messages" :running="running" @send="(input, resources) => ask(input, resources)" />
+      <ChatUI
+        v-model:messages="messages"
+        :running="running"
+        @send="(input, resources) => ask(input, resources)"
+      />
     </div>
   </div>
 </template>

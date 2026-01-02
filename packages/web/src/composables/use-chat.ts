@@ -7,6 +7,7 @@ import { ref } from 'vue'
 export const useChat = (id: string) => {
   const messages = ref<ClientMessage[]>([])
   const pages = ref<Page[]>([])
+  const currentPage = ref<string | null>(null)
   const running = ref(false)
   const stream = ref<EdenWS | null>(null)
   const streamOpen = ref(false)
@@ -18,6 +19,14 @@ export const useChat = (id: string) => {
     },
     uuid: () => crypto.randomUUID(),
   })
+
+  const switchPage = (id: string) => {
+    if (!Object.values(pages.value).some(page => page.id === id)) {
+      return
+    }
+    console.log('switchPage', id)
+    currentPage.value = id
+  }
 
   const sync = async () => {
     const { data, error } = await client.chat({ id }).get()
@@ -70,8 +79,10 @@ export const useChat = (id: string) => {
   return {
     messages,
     pages,
+    currentPage,
     running,
     sync,
     ask,
+    switchPage,
   }
 }
