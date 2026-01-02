@@ -4,6 +4,8 @@ import { storeToRefs } from 'pinia'
 import { useSettingsStore } from '#/store/settings'
 import SettingsItem from '#/components/settings/SettingsItem.vue'
 import { computed } from 'vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faRobot, faWindowMaximize } from '@fortawesome/free-solid-svg-icons'
 
 const settingsStore = useSettingsStore()
 const { baseURL, apiKey, agentModel, titleModel, colorMode } = storeToRefs(settingsStore)
@@ -37,6 +39,7 @@ const sectionTitleClass = 'font-semibold text-muted-foreground border-b pt-3 pb-
 
       <section class="space-y-3">
         <h2 :class="sectionTitleClass">
+          <FontAwesomeIcon :icon="faRobot" />
           {{ t('settings.models.title') }}
         </h2>
 
@@ -53,6 +56,7 @@ const sectionTitleClass = 'font-semibold text-muted-foreground border-b pt-3 pb-
 
       <section class="space-y-3">
         <h2 :class="sectionTitleClass">
+          <FontAwesomeIcon :icon="faWindowMaximize" />
           {{ t('settings.interface.title') }}
         </h2>
 
