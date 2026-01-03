@@ -5,7 +5,9 @@
     "test": "bun test",
     "test:resource": "bun test test/resource.test.ts",
     "test:chat": "bun test test/chat.test.ts",
-    "dev": "bun run --env-file=\"../../.env\" --watch src/index.ts"
+    "dev": "bun run --env-file=\"../../.env\" --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun --minify",
+    "start": "bun run dist/index.js"
   },
   "exports": {
     "./sdk": "./src/sdk.ts"

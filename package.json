@@ -7,14 +7,16 @@
     "test": "vitest",
     "lint": "eslint . --fix",
     "dev": "pnpm --filter @chat-tutor/*  --parallel dev",
-    "dev:client": "pnpm --filter @chat-tutor/client dev",
-    "dev:web": "pnpm --filter @chat-tutor/web dev",
+    "client:dev": "pnpm --filter @chat-tutor/client dev",
+    "web:dev": "pnpm --filter @chat-tutor/web dev",
     "build": "pnpm --filter @chat-tutor/* build",
-    "build:client": "pnpm --filter @chat-tutor/client build",
-    "build:web": "pnpm --filter @chat-tutor/web build",
+    "client:build": "pnpm --filter @chat-tutor/client build",
+    "web:build": "pnpm --filter @chat-tutor/web build",
     "db:push": "pnpm --filter @chat-tutor/db push",
     "db:generate": "pnpm --filter @chat-tutor/db generate",
-    "db:studio": "pnpm --filter @chat-tutor/db studio"
+    "db:studio": "pnpm --filter @chat-tutor/db studio",
+    "client:start": "pnpm --filter @chat-tutor/client start",
+    "web:start": "pnpm --filter @chat-tutor/web preview"
   },
   "packageManager": "pnpm@10.14.0",
   "dependencies": {
