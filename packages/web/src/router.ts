@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Error from './pages/error.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -13,6 +14,14 @@ const router = createRouter({
         {
           path: 'settings',
           component: () => import('#/pages/settings/index.vue'),
+        },
+        // 404
+        {
+          path: ':pathMatch(.*)',
+          component: Error,
+          props: {
+            type: '404',
+          },
         },
       ],
     },
