@@ -6,7 +6,16 @@ import { client } from '#/utils/client'
 import { useCreateChatStore } from '#/utils/stores'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useSidebar } from '@chat-tutor/ui'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  useSidebar,
+  Button
+} from '@chat-tutor/ui'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faWarning } from '@fortawesome/free-solid-svg-icons'
+import { useSettingsStore } from '#/store/settings'
 
 const input = ref('')
 const resources = ref<Resource[]>([])
@@ -42,6 +51,12 @@ const greeting = computed(() => {
 })
 
 const { isMobile } = useSidebar()
+
+const settings = useSettingsStore()
+
+const showSettingsAlert = computed(() => {
+  return (import.meta.env.VITE_USER_KEY_REQUIRED === 'true') && (!settings.apiKey)
+})
 </script>
 
 <template>
@@ -57,8 +72,8 @@ const { isMobile } = useSidebar()
       >
       <span class="text-xl title font-bold select-none">ChatTutor</span>
     </div>
-    <div class="flex size-full items-center justify-center flex-col gap-18">
-      <h1 class="text-4xl title select-none font-mono">
+    <div class="flex size-full items-center justify-center flex-col">
+      <h1 class="text-4xl title select-none font-mono mb-18">
         {{ greeting }}
       </h1>
       <div class="h-32 w-full max-w-2xl">
@@ -69,6 +84,20 @@ const { isMobile } = useSidebar()
           @send="handleSend"
         />
       </div>
+      <Alert class="mt-3" v-if="showSettingsAlert">
+        <FontAwesomeIcon :icon="faWarning" />
+        <AlertTitle>
+          {{ t('settings.alert.keyRequired') }}
+        </AlertTitle>
+        <AlertDescription>
+          <div>
+            {{ t('settings.alert.pleaseSetKey') }}
+          </div>
+          <Button class="mt-1" variant="secondary" @click="router.push('/settings')">
+            {{ t('settings.title') }}
+          </Button>
+        </AlertDescription>
+      </Alert>
     </div>
   </div>
 </template>
